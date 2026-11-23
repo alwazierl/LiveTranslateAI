@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var listening = false
     private var ready = false
     private var busy = false
+    private var askedInstall = false
 
     private lateinit var subtitle: TextView
     private lateinit var status: TextView
@@ -234,16 +235,29 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun speak(text: String) {
         val engine = tts
-        if (engine == null || !ttsReady) { finishCycle(); return }
+        if (engine == null || !ttsReady) {
+            notify("محرك النطق غير جاهز. ثبّت Speech Services by Google من متجر Play.")
+            finishCycle(); return
+        }
         val dst = dstLang()
         val r = engine.setLanguage(Locale.forLanguageTag(dst.tag))
         if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
-            status.text = "صوت اللغة ${dst.label} غير مثبت في الهاتف. ثبّته من إعدادات تحويل النص إلى كلام."
-            finishCycle()
-            return
+            notify("صوت ${dst.label} غير مثبت. ثبّته من إعدادات تحويل النص إلى كلام.")
+            if (!askedInstall) {
+                askedInstall = true
+                try { startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) } catch (_: Exception) { }
+            }
+            finishCycle(); return
         }
         val code = engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "live-translation")
-        if (code == TextToSpeech.ERROR) finishCycle()
+        if (code == TextToSpeech.ERROR) {
+            notify("فشل تشغيل صوت النطق.")
+            finishCycle()
+        }
+    }
+
+    private fun notify(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun finishCycle() {
@@ -265,6 +279,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     override fun onInit(result: Int) {
         ttsReady = result == TextToSpeech.SUCCESS
+        if (!ttsReady) notify("تعذر تشغيل محرك النطق في الهاتف.")
         if (ttsReady) {
             tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) { }
