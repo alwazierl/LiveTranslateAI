@@ -10,7 +10,9 @@
     </queries>
     <application
         android:allowBackup="false"
-        android:label="Live Translate AI"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="Amine Translate"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" android:exported="true">
