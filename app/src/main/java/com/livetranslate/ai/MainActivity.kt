@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             setPadding(0, 12, 0, 12)
         }
         root.addView(text("LIVE TRANSLATE AI", 24f, 0xFFFFFFFF.toInt(), true))
+        root.addView(text("by Amine", 14f, 0xFF8BC34A.toInt()))
         subtitle = text("", 15f, 0xFFB9D8CF.toInt())
         root.addView(subtitle)
         status = text("جارٍ تجهيز الترجمة…", 14f, 0xFF9CCC65.toInt())
